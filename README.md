@@ -1,4 +1,4 @@
-# TTSServer
+# SayTTS
 
 OpenAI Speech API compatible Text-to-Speech server for macOS using the built-in `say` command.
 
