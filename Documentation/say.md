@@ -1,140 +1,132 @@
-SAY(1)                     Speech Synthesis Manager                     SAY(1)
+# say
 
+Convert text to audible speech using the Speech Synthesis Manager.
 
-NAME
-       say - Convert text to audible speech
+## Synopsis
 
-SYNOPSIS
-           say [-v voice] [-r rate] [-o outfile [audio format options] | -n name:port | -a device] [-f file | string ...]
+```bash
+say [-v voice] [-r rate] [-o outfile [audio format options] | -n name:port | -a device] [-f file | string ...]
+```
 
-DESCRIPTION
-       This tool uses the Speech Synthesis manager to convert input text to
-       audible speech and either play it through the sound output device
-       chosen in System Preferences or save it to an AIFF file.
+## Description
 
-OPTIONS
-       string
-           Specify the text to speak on the command line. This can consist of
-           multiple arguments, which are considered to be separated by spaces.
+This tool uses the Speech Synthesis manager to convert input text to audible speech and either play it through the sound output device chosen in System Preferences or save it to an audio file.
 
-       -f file, --input-file=file
-           Specify a file to be spoken. If file is - or neither this parameter
-           nor a message is specified, read from standard input.
+## Options
 
-       -v voice, --voice=voice
-           Specify the voice to be used. Default is the voice selected in
-           System Preferences. To obtain a list of voices installed in the
-           system, specify '?' as the voice name.
+### Text Input
 
-       -r rate, --rate=rate
-           Speech rate to be used, in words per minute.
+| Option | Description |
+|--------|-------------|
+| `string` | Text to speak on the command line. Can be multiple arguments (separated by spaces) |
+| `-f` `file`, `--input-file=file` | File to be spoken. Use `-` to read from standard input |
 
-       -o out.aiff, --output-file=file
-           Specify the path for an audio file to be written. AIFF is the
-           default and should be supported for most voices, but some voices
-           support many more file formats.
+### Voice Settings
 
-       -n name, --network-send=name
-       -n name:port, --network-send=name:port
-       -n :port, --network-send=:port
-       -n :, --network-send=:
-           Specify a service name (default "AUNetSend") and/or IP port to be
-           used for redirecting the speech output through AUNetSend.
+| Option | Description |
+|--------|-------------|
+| `-v` `voice`, `--voice=voice` | Voice to use. Default is the voice selected in System Preferences. Use `?` to list installed voices |
+| `-r` `rate`, `--rate=rate` | Speech rate in words per minute |
 
-       -a ID, --audio-device=ID
-       -a name, --audio-device=name
-           Specify, by ID or name prefix, an audio device to be used to play
-           the audio. To obtain a list of audio output devices, specify '?' as
-           the device name.
+### Output Options
 
-       --progress
-           Display a progress meter during synthesis.
+| Option | Description |
+|--------|-------------|
+| `-o` `out.aiff`, `--output-file=file` | Path for audio file to write. AIFF is default and supported by most voices. Some voices support additional formats |
+| `-n` `name`, `--network-send=name`<br>`-n` `name:port`<br>`-n` `:port`<br>`-n` `:` | Redirect speech output through AUNetSend. Default service name is `AUNetSend` |
+| `-a` `ID`, `--audio-device=ID`<br>`-a` `name`, `--audio-device=name` | Audio device to play audio (by ID or name prefix). Use `?` to list audio output devices |
+| `--progress` | Display a progress meter during synthesis |
+| `-i`, `--interactive`, `--interactive=markup` | Print text line by line during synthesis, highlighting words as spoken. See markup options below |
 
-       -i, --interactive, --interactive=markup
-           Print the text line by line during synthesis, highlighting words as
-           they are spoken. Markup can be one of
+### Interactive Mode Markup
 
-           •   A terminfo capability as described in terminfo(5), e.g. bold,
-               smul, setaf 1.
+The `--interactive` option supports markup styles:
 
-           •   A color name, one of black, red, green, yellow, blue, magenta,
-               cyan, or white.
+- **Terminfo capability** (e.g., `bold`, `smul`, `setaf 1`)
+- **Color name**: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`
+- **Foreground/background**: `green/black` (slash-separated, omit foreground for background only)
 
-           •   A foreground and background color from the above list,
-               separated by a slash, e.g. green/black. If the foreground color
-               is omitted, only the background color is set.
+Default is `smso` (reverse video).
 
-           If markup is not specified, it defaults to smso, i.e. reverse
-           video.
+## Audio Formats
 
-       If the input is a TTY, text is spoken line by line, and the output
-       file, if specified, will only contain audio for the last line of the
-       input.  Otherwise, text is spoken all at once.
+Starting in macOS 10.6, file formats other than AIFF may be specified. The file format can often be inferred from the extension, but these options provide finer control:
 
-AUDIO FORMATS
-       Starting in MacOS X 10.6, file formats other than AIFF may be
-       specified, although not all third party synthesizers may initially
-       support them. In simple cases, the file format can be inferred from the
-       extension, although generally some of the options below are required
-       for finer grained control:
+| Option | Description |
+|--------|-------------|
+| `--file-format=format` | Format of file to write: `AIFF`, `caff`, `m4af`, `WAVE`. Use `?` to list writable formats |
+| `--data-format=format` | Audio data format. For linear PCM: `[BE\|LE][F\|I\|UI]{8\|16\|24\|32\|64}`<br>Others: `aac`, `alac`<br>Optionally append `@samplerate` and `/hexflags`<br>Use `?` to list formats for the specified file format |
+| `--channels=channels` | Number of channels (most synthesizers produce mono only) |
+| `--bit-rate=rate` | Bit rate for formats like AAC. Use `?` to list valid rates |
+| `--quality=quality` | Audio converter quality: 0-127 (lowest to highest) |
 
-       --file-format=format
-           The format of the file to write (AIFF, caff, m4af, WAVE).
-           Generally, it's easier to specify a suitable file extension for the
-           output file. To obtain a list of writable file formats, specify '?'
-           as the format name.
+## Exit Status
 
-       --data-format=format
-           The format of the audio data to be stored. Formats other than
-           linear PCM are specified by giving their format identifiers (aac,
-           alac). Linear PCM formats are specified as a sequence of:
+Returns `0` if text was spoken successfully, otherwise non-zero. Diagnostic messages are printed to standard error.
 
-           Endianness (optional)
-               One of BE (big endian) or LE (little endian). Default is native
-               endianness.
+## Behavior
 
-           Data type
-               One of F (float), I (integer), or, rarely, UI (unsigned
-               integer).
+- If input is a TTY: text is spoken line by line, and output file (if specified) contains only audio for the last line
+- Otherwise: text is spoken all at once
 
-           Sample size
-               One of 8, 16, 24, 32, 64.
+## Examples
 
-           Most available file formats only support a subset of these sample
-           formats.
+Speak "Hello, World":
 
-           To obtain a list of audio data formats for a file format specified
-           explicitly or by file name, specify '?' as the format name.
+```bash
+say Hello, World
+```
 
-           The format identifier optionally can be followed by @samplerate and
-           /hexflags for the format.
+Speak from file using voice "Alex" and save to AIFF:
 
-       --channels=channels
-           The number of channels. This will generally be of limited use, as
-           most speech synthesizers produce mono audio only.
+```bash
+say -v Alex -o hi -f hello_world.txt
+```
 
-       --bit-rate=rate
-           The bit rate for formats like AAC. To obtain a list of valid bit
-           rates, specify '?' as the rate. In practice, not all of these bit
-           rates will be available for a given format.
+Interactive mode with green highlighting:
 
-       --quality=quality
-           The audio converter quality level between 0 (lowest) and 127
-           (highest).
+```bash
+say --interactive=green spending each day the color of the leaves
+```
 
-ERRORS
-       say returns 0 if the text was spoken successfully, otherwise non-zero.
-       Diagnostic messages will be printed to standard error.
+Save to AAC with embedded silence command:
 
-EXAMPLES
-          say Hello, World
-          say -v Alex -o hi -f hello_world.txt
-          say --interactive=/green spending each day the color of the leaves
-          say -o hi.aac 'Hello, [[slnc 200]] World'
-          say -o hi.m4a --data-format=alac Hello, World.
-          say -o hi.caf --data-format=LEF32@8000 Hello, World
+```bash
+say -o hi.aac 'Hello, [[slnc 200]] World'
+```
 
-          say -v '?'
-          say --file-format=?
-          say --file-format=caff --data-format=?
-          say -o hi.m4a --bit-rate=?
+Save to M4A with ALAC format:
+
+```bash
+say -o hi.m4a --data-format=alac Hello, World.
+```
+
+Save to CAF with specific data format:
+
+```bash
+say -o hi.caf --data-format=LEF32@8000 Hello, World
+```
+
+Query available voices:
+
+```bash
+say -v '?'
+```
+
+Query available file formats:
+
+```bash
+say --file-format=?
+```
+
+Query data formats for CAF:
+
+```bash
+say --file-format=caff --data-format=?
+```
+
+Query available bit rates:
+
+```bash
+say -o hi.m4a --bit-rate=?
+```
