@@ -1,4 +1,3 @@
-// Sources/HBTTSServer/TTSServerError.swift
 import Foundation
 import Hummingbird
 

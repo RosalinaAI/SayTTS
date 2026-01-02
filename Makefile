@@ -22,7 +22,7 @@ service: install
 	'<plist version="1.0">' \
 	'<dict>' \
 	'    <key>Label</key>' \
-	'    <string>com.github.nusov.TTSServer</string>' \
+	'    <string>HatsumeAI.TTSServer</string>' \
 	'    <key>ProgramArguments</key>' \
 	'    <array>' \
 	'        <string>$(HOME)/.bin/TTSServer</string>' \
@@ -33,16 +33,24 @@ service: install
 	'    <true/>' \
 	'</dict>' \
 	'</plist>' \
-	> $(HOME)/Library/LaunchAgents/com.github.nusov.TTSServer.plist
-	@echo "Service installed to: $(HOME)/Library/LaunchAgents/com.github.nusov.TTSServer.plist"
+	> $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist
+	@echo "Service installed to: $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist"
 	@echo ""
 	@echo "To enable and start the service:"
-	@echo "  launchctl load $(HOME)/Library/LaunchAgents/com.github.nusov.TTSServer.plist"
+	@echo "  launchctl load $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist"
 	@echo ""
 	@echo "To disable and stop the service:"
-	@echo "  launchctl unload $(HOME)/Library/LaunchAgents/com.github.nusov.TTSServer.plist"
+	@echo "  launchctl unload $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist"
 	@echo ""
 	@echo "To check service status:"
 	@echo "  launchctl list | grep TTSServer"
+
+start: service
+	launchctl load $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist
+
+stop: service
+	launchctl unload $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist
+
+restart: stop start
 
 

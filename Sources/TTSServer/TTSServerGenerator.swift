@@ -1,4 +1,3 @@
-// Sources/HBTTSServer/TTSServerGenerator.swift
 import Foundation
 
 /// Generates speech using macOS say command

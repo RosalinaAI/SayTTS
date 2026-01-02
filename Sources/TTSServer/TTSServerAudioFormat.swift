@@ -1,4 +1,3 @@
-// Sources/HBTTSServer/TTSServerAudioFormat.swift
 import Foundation
 
 /// Supported audio formats for TTS output
@@ -51,12 +50,11 @@ enum TTSServerAudioFormat: String, Decodable {
         }
     }
 
-    /// Whether this format is supported on macOS (MP3 and Opus require LAME)
+    /// Whether this format is supported on macOS
+    /// MP3 and Opus require ffmpeg to be installed
     var isSupported: Bool {
         switch self {
-        case .mp3, .opus:
-            return false
-        case .aac, .flac, .wav, .pcm, .aiff:
+        case .mp3, .opus, .aac, .flac, .wav, .pcm, .aiff:
             return true
         }
     }

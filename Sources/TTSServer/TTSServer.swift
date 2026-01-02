@@ -1,4 +1,3 @@
-// Sources/HBTTSServer/HBTTSServer.swift
 import Foundation
 import Configuration
 

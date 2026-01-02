@@ -1,4 +1,3 @@
-// Sources/HBTTSServer/TTSServerRequest.swift
 import Foundation
 
 /// Request model conforming to OpenAI Speech API specification

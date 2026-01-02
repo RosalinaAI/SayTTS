@@ -6,11 +6,43 @@ OpenAI Speech API compatible Text-to-Speech server for macOS using the built-in 
 
 - macOS 14.0+
 - Xcode Command Line Tools (for `swift` and `afconvert`)
+- ffmpeg (for MP3 and Opus format support)
+
+Install ffmpeg via Homebrew:
+```bash
+brew install ffmpeg
+```
 
 ## Building
 
 ```bash
 swift build
+```
+
+## Installing as a service
+
+To install TTSServer as a launchd service that starts automatically:
+
+```bash
+make service
+```
+
+This will:
+1. Build the release binary
+2. Install it to `~/.bin/TTSServer`
+3. Create a launchd plist at `~/Library/LaunchAgents/RosalinaAI.TTSServer.plist`
+
+Manage the service with:
+
+```bash
+# Enable and start the service
+launchctl load ~/Library/LaunchAgents/RosalinaAI.TTSServer.plist
+
+# Disable and stop the service
+launchctl unload ~/Library/LaunchAgents/RosalinaAI.TTSServer.plist
+
+# Check service status
+launchctl list | grep TTSServer
 ```
 
 ## Running
@@ -62,10 +94,10 @@ Generate audio from text.
 | **wav** | Yes | Uncompressed WAV at 24kHz mono, 16-bit PCM |
 | **pcm** | Yes | Raw 24kHz mono, 16-bit signed little-endian samples (no header) |
 | **aiff** | Yes | Default output from `say` command |
-| **mp3** | **No** | Not available on macOS without LAME encoder |
-| **opus** | **No** | Not available on macOS |
+| **mp3** | Yes | MP3 encoding (requires ffmpeg) |
+| **opus** | Yes | Opus encoding (requires ffmpeg) |
 
-> Note: MP3 and Opus return error `"Format not supported"` because macOS does not include encoders for these formats.
+> Note: MP3 and Opus formats require ffmpeg to be installed on your system.
 
 ## Usage Examples
 
@@ -136,6 +168,32 @@ curl -X POST http://127.0.0.1:8080/v1/audio/speech \
   --output speech.flac
 ```
 
+### Generate MP3 (requires ffmpeg)
+
+```bash
+curl -X POST http://127.0.0.1:8080/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "MP3 compressed audio.",
+    "model": "tts-1",
+    "response_format": "mp3"
+  }' \
+  --output speech.mp3
+```
+
+### Generate Opus (requires ffmpeg)
+
+```bash
+curl -X POST http://127.0.0.1:8080/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "Opus compressed audio.",
+    "model": "tts-1",
+    "response_format": "opus"
+  }' \
+  --output speech.opus
+```
+
 ## Testing
 
 Run the test suite:
@@ -150,9 +208,9 @@ swift test
 |-------|-------------|
 | `Invalid model` | Model must be `"tts-1"` |
 | `Invalid input` | Input text is empty or exceeds 4096 characters |
-| `Format not supported` | Requested mp3 or opus format |
+| `Format not supported` | Requested format is not available |
 | `Say command failed` | Underlying `say` command error |
-| `Audio conversion failed` | `afconvert` conversion error |
+| `Audio conversion failed` | `afconvert` or `ffmpeg` conversion error |
 
 ## License
 

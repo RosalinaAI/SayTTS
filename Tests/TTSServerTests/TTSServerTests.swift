@@ -1,4 +1,3 @@
-// Tests/HBTTSServerTests/TTSServerTests.swift
 import Testing
 @testable import TTSServer
 import Foundation
@@ -39,8 +38,8 @@ struct TTSServerTests {
 
     @Test("TTSServerAudioFormat support detection")
     func testAudioFormatSupport() {
-        #expect(TTSServerAudioFormat.mp3.isSupported == false)  // Not available on macOS
-        #expect(TTSServerAudioFormat.opus.isSupported == false)  // Not available on macOS
+        #expect(TTSServerAudioFormat.mp3.isSupported == true)  // Requires ffmpeg
+        #expect(TTSServerAudioFormat.opus.isSupported == true)  // Requires ffmpeg
         #expect(TTSServerAudioFormat.aac.isSupported == true)
         #expect(TTSServerAudioFormat.flac.isSupported == true)
         #expect(TTSServerAudioFormat.wav.isSupported == true)

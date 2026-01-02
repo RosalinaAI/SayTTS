@@ -1,4 +1,3 @@
-// Sources/HBTTSServer/TTSServerAudioConverter.swift
 import Foundation
 
 /// Handles audio format conversion using afconvert tool
@@ -21,6 +20,11 @@ struct TTSServerAudioConverter {
         // For AIFF, just return the input (no conversion needed)
         if format == .aiff {
             return inputURL
+        }
+
+        // For MP3 or Opus, use ffmpeg
+        if format == .mp3 || format == .opus {
+            return try await runFFmpegConvert(inputURL: inputURL, outputURL: outputURL, format: format)
         }
 
         // For PCM, we need special handling
@@ -81,5 +85,52 @@ struct TTSServerAudioConverter {
         try? FileManager.default.removeItem(at: wavURL)
 
         return outputURL
+    }
+
+    /// Runs ffmpeg to convert audio to MP3 or Opus format
+    /// - Parameters:
+    ///   - inputURL: The source AIFF file URL
+    ///   - outputURL: The destination file URL
+    ///   - format: The target format (mp3 or opus)
+    /// - Returns: URL to the converted file
+    func runFFmpegConvert(inputURL: URL, outputURL: URL, format: TTSServerAudioFormat) async throws -> URL {
+        try await withCheckedThrowingContinuation { cont in
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/ffmpeg")
+
+            var arguments = ["-y"]  // Overwrite output file if exists
+            arguments += ["-i", inputURL.path]  // Input file
+
+            // Add format-specific arguments
+            switch format {
+            case .mp3:
+                arguments += ["-codec:a", "libmp3lame", "-b:a", "64k"]
+            case .opus:
+                arguments += ["-codec:a", "libopus", "-b:a", "64k", "-vbr", "on"]
+            default:
+                break
+            }
+
+            arguments += [outputURL.path]
+            process.arguments = arguments
+
+            process.terminationHandler = { proc in
+                if proc.terminationStatus == 0 {
+                    cont.resume(returning: outputURL)
+                } else {
+                    cont.resume(throwing: TTSServerError.conversionFailed(
+                        "ffmpeg exited with code \(proc.terminationStatus)"
+                    ))
+                }
+            }
+
+            do {
+                try process.run()
+            } catch {
+                cont.resume(throwing: TTSServerError.conversionFailed(
+                    "ffmpeg failed: \(error.localizedDescription)"
+                ))
+            }
+        }
     }
 }
