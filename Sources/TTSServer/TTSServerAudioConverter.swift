@@ -96,7 +96,7 @@ struct TTSServerAudioConverter {
     func runFFmpegConvert(inputURL: URL, outputURL: URL, format: TTSServerAudioFormat) async throws -> URL {
         try await withCheckedThrowingContinuation { cont in
             let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/ffmpeg")
+            process.executableURL = URL(fileURLWithPath: TTSServerConfiguration.shared.ffmpegPath)
 
             var arguments = ["-y"]  // Overwrite output file if exists
             arguments += ["-i", inputURL.path]  // Input file

@@ -1,3 +1,8 @@
+# Default configuration values (can be overridden via make arguments or environment)
+HTTP_PORT ?= 8080
+HTTP_HOST ?= 127.0.0.1
+FFMPEG_PATH ?= /opt/homebrew/bin/ffmpeg
+
 build:
 	swift build
 
@@ -27,6 +32,15 @@ service: install
 	'    <array>' \
 	'        <string>$(HOME)/.bin/TTSServer</string>' \
 	'    </array>' \
+	'    <key>EnvironmentVariables</key>' \
+	'    <dict>' \
+	'        <key>HTTP_PORT</key>' \
+	'        <string>$(HTTP_PORT)</string>' \
+	'        <key>HTTP_HOST</key>' \
+	'        <string>$(HTTP_HOST)</string>' \
+	'        <key>FFMPEG_PATH</key>' \
+	'        <string>$(FFMPEG_PATH)</string>' \
+	'    </dict>' \
 	'    <key>RunAtLoad</key>' \
 	'    <true/>' \
 	'    <key>KeepAlive</key>' \
@@ -36,6 +50,11 @@ service: install
 	> $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist
 	@echo "Service installed to: $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist"
 	@echo ""
+	@echo "Configuration:"
+	@echo "  HTTP_PORT=$(HTTP_PORT)"
+	@echo "  HTTP_HOST=$(HTTP_HOST)"
+	@echo "  FFMPEG_PATH=$(FFMPEG_PATH)"
+	@echo ""
 	@echo "To enable and start the service:"
 	@echo "  launchctl load $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist"
 	@echo ""
@@ -44,12 +63,17 @@ service: install
 	@echo ""
 	@echo "To check service status:"
 	@echo "  launchctl list | grep TTSServer"
+	@echo ""
 
 start: service
 	launchctl load $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist
+	@echo "Service started..."
+	@echo ""
 
 stop: service
 	launchctl unload $(HOME)/Library/LaunchAgents/HatsumeAI.TTSServer.plist
+	@echo "Service stopped..."
+	@echo ""
 
 restart: stop start
 

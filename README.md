@@ -30,16 +30,41 @@ make service
 This will:
 1. Build the release binary
 2. Install it to `~/.bin/TTSServer`
-3. Create a launchd plist at `~/Library/LaunchAgents/RosalinaAI.TTSServer.plist`
+3. Create a launchd plist at `~/Library/LaunchAgents/HatsumeAI.TTSServer.plist`
+
+### Service configuration
+
+The service can be configured with variables when installing:
+
+```bash
+# Custom port
+make service HTTP_PORT=3000
+
+# Custom host and port
+make service HTTP_HOST=0.0.0.0 HTTP_PORT=9000
+
+# Custom ffmpeg path
+make service FFMPEG_PATH=/usr/local/bin/ffmpeg
+
+# All variables
+make service HTTP_HOST=0.0.0.0 HTTP_PORT=3000 FFMPEG_PATH=/usr/local/bin/ffmpeg
+```
 
 Manage the service with:
 
 ```bash
-# Enable and start the service
-launchctl load ~/Library/LaunchAgents/RosalinaAI.TTSServer.plist
+# Start the service
+make start
 
-# Disable and stop the service
-launchctl unload ~/Library/LaunchAgents/RosalinaAI.TTSServer.plist
+# Stop the service
+make stop
+
+# Restart the service
+make restart
+
+# Or manually with launchctl
+launchctl load ~/Library/LaunchAgents/HatsumeAI.TTSServer.plist
+launchctl unload ~/Library/LaunchAgents/HatsumeAI.TTSServer.plist
 
 # Check service status
 launchctl list | grep TTSServer
@@ -55,17 +80,18 @@ The server defaults to `http://127.0.0.1:8080`
 
 ### Configuration
 
-The server host and port can be configured via environment variables:
+The server can be configured via environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `HTTP_HOST` | `127.0.0.1` | Host address to bind to |
 | `HTTP_PORT` | `8080` | Port number to listen on |
+| `FFMPEG_PATH` | `/opt/homebrew/bin/ffmpeg` | Path to ffmpeg executable |
 
 Example:
 
 ```bash
-HTTP_HOST=0.0.0.0 HTTP_PORT=3000 swift run
+HTTP_HOST=0.0.0.0 HTTP_PORT=3000 FFMPEG_PATH=/usr/local/bin/ffmpeg swift run
 ```
 
 ## API Endpoint

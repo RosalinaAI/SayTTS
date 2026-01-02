@@ -1,6 +1,4 @@
 import Foundation
-import Configuration
-
 import Hummingbird
 
 @main
@@ -64,15 +62,13 @@ struct TTSServerApp {
         }
 
         // Get configuration
-        let config = ConfigReader(provider: EnvironmentVariablesProvider())
-        let host = config.string(forKey: "http.host", default: "127.0.0.1")
-        let port = config.int(forKey: "http.port", default: 8080)
-        
+        let config = TTSServerConfiguration.shared
+
         // Start the server
         let app = Application(
             router: router,
             configuration: .init(
-                address: .hostname(host, port: port),
+                address: .hostname(config.host, port: config.port),
                 serverName: "TTSServer"
             )
         )
