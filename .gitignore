@@ -67,3 +67,6 @@ fastlane/test_output
 
 # Python
 venv
+
+# IDE
+.vscode
