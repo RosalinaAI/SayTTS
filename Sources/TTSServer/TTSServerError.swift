@@ -11,6 +11,10 @@ enum TTSServerError: LocalizedError {
     case processFailed(Error)
     case fileReadFailed(String)
     case fileWriteFailed(String)
+    case recognitionFailed(String)
+    case invalidFile(String)
+    case missingFile
+    case missingModel
 
     var errorDescription: String? {
         switch self {
@@ -32,6 +36,14 @@ enum TTSServerError: LocalizedError {
             return "Failed to read file: \(path)."
         case .fileWriteFailed(let path):
             return "Failed to write file: \(path)."
+        case .recognitionFailed(let reason):
+            return "Speech recognition failed: \(reason)."
+        case .invalidFile(let reason):
+            return "Invalid file: \(reason)."
+        case .missingFile:
+            return "Missing required file parameter."
+        case .missingModel:
+            return "Missing required model parameter."
         }
     }
 
@@ -42,9 +54,9 @@ enum TTSServerError: LocalizedError {
         // Determine status code based on error type
         let status: HTTPResponse.Status
         switch self {
-        case .invalidModel, .invalidVoice, .invalidInput, .formatNotSupported:
+        case .invalidModel, .invalidVoice, .invalidInput, .formatNotSupported, .missingFile, .missingModel, .invalidFile:
             status = .badRequest  // 400 - client error
-        case .conversionFailed, .sayCommandFailed, .processFailed, .fileReadFailed, .fileWriteFailed:
+        case .conversionFailed, .sayCommandFailed, .processFailed, .fileReadFailed, .fileWriteFailed, .recognitionFailed:
             status = .internalServerError  // 500 - server error
         }
 
